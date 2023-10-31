@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  username        Int      @default(autoincrement()) @id 
+  surname         String? 
+  bday            DateTime @db.Date
+  email           String   @unique
+  isAdmin         Boolean? @default(false)
+
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+}
+
+model Event {
+  id              Int      @default(autoincrement()) @id
+  organizer       Int       
+  category        Int
+  title           String
+  startDate       DateTime
+  description     String?
+  maxGuestAmount  Int?     
+  isPublic        Boolean? @default(false)
+  location        String
+  
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+}
+
+model EventRating {
+  id              Int      @default(autoincrement()) @id
+  raterUser       Int       
+  event           Int
+  message         String?
+  rate            Float    @default(0.0)
+}
+
+model UserRating {
+  id              Int      @default(autoincrement()) @id
+  raterUser       Int       
+  ratedUser       Int
+  message         String?
+  rate            Float    @default(5.0)
+}
+
+model EventRegistrations {
+  id              Int      @default(autoincrement()) @id
+  event           Int       
+  user            Int
+  guestAmount     Int      @default(0)
+  rate            Float    @default(5.0)
+}
+
+
+model Message {
+  id              Int      @default(autoincrement()) @id
+  chat            Int
+  user            Int
+  message         String
+
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+}
+
+model Chat {
+  id              Int      @default(autoincrement()) @id
+  event           Int
+}
+
+model Notification {
+  id              Int      @default(autoincrement()) @id
+  event           Int
+  message         String
+
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+}
+
+model Category {
+  id              Int      @default(autoincrement()) @id
+  title           String
+  description     String?
+}
+
+model Album {
+  id              Int      @default(autoincrement()) @id
+  event           Int
+  title           String
+}
+
+model Photo {
+  id              Int      @default(autoincrement()) @id
+  album           Int
+  user            Int
+  photo           Bytes
+
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+}
+
