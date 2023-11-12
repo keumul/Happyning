@@ -8,7 +8,9 @@ datasource db {
 }
 
 model User {
-  username        Int      @default(autoincrement()) @id 
+  id              Int      @default(autoincrement()) @id 
+  username        String   @unique
+  password        String 
   surname         String? 
   bday            DateTime @db.Date
   email           String   @unique
@@ -16,12 +18,19 @@ model User {
 
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
+
+  event               Event[]
+  photo               Photo[]
+  eventRating         EventRating[]
+  eventRegistrations  EventRegistrations[]
+  raterUser           UserRating[] @relation("RaterRelation")
+  ratedUser           UserRating[] @relation("RatedRelation")
+
+  @@map("users")
 }
 
 model Event {
-  id              Int      @default(autoincrement()) @id
-  organizer       Int       
-  category        Int
+  id              Int      @default(autoincrement()) @id   
   title           String
   startDate       DateTime
   description     String?
@@ -31,30 +40,62 @@ model Event {
   
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
+
+  organizerId     Int
+  organizer       User @relation(fields: [organizerId], references: [id])
+
+  categoryId      Int
+  category        Category @relation(fields: [categoryId], references: [id])
+  
+
+  eventRating         EventRating[]
+  eventRegistrations  EventRegistrations[]
+  chat                Chat[]
+  notification        Notification[]
+  album               Album[]
+
+  @@map("events")
 }
 
 model EventRating {
   id              Int      @default(autoincrement()) @id
-  raterUser       Int       
-  event           Int
   message         String?
   rate            Float    @default(0.0)
+
+  eventId         Int
+  event           Event @relation(fields: [eventId], references: [id])
+
+  userId          Int
+  user            User @relation(fields: [userId], references: [id])
+
+  @@map("events_rating") 
 }
 
 model UserRating {
   id              Int      @default(autoincrement()) @id
-  raterUser       Int       
-  ratedUser       Int
   message         String?
   rate            Float    @default(5.0)
+
+  raterId          Int
+  rater            User @relation(name: "RaterRelation", fields: [raterId], references: [id])
+
+  ratedId          Int
+  rated            User @relation(name: "RatedRelation", fields: [ratedId], references: [id])
+
+  @@map("users_rating")
 }
 
 model EventRegistrations {
   id              Int      @default(autoincrement()) @id
-  event           Int       
-  user            Int
   guestAmount     Int      @default(0)
-  rate            Float    @default(5.0)
+
+  eventId         Int
+  event           Event @relation(fields: [eventId], references: [id])
+
+  userId          Int
+  user            User @relation(fields: [userId], references: [id])
+
+  @@map("events_registrations")
 }
 
 
@@ -66,41 +107,67 @@ model Message {
 
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
+
+  @@map("messages")
 }
 
 model Chat {
   id              Int      @default(autoincrement()) @id
-  event           Int
+
+  eventId         Int
+  event           Event @relation(fields: [eventId], references: [id])
+
+  @@map("chats")
 }
 
 model Notification {
   id              Int      @default(autoincrement()) @id
-  event           Int
   message         String
 
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
+
+  eventId         Int
+  event           Event @relation(fields: [eventId], references: [id])
+
+  @@map("notifications")
 }
 
 model Category {
   id              Int      @default(autoincrement()) @id
   title           String
   description     String?
+
+  event           Event[]
+
+  @@map("categories")
 }
 
 model Album {
   id              Int      @default(autoincrement()) @id
-  event           Int
   title           String
+
+  eventId         Int
+  event           Event @relation(fields: [eventId], references: [id])
+
+  photo           Photo[]
+
+  @@map("albums")
 }
 
 model Photo {
   id              Int      @default(autoincrement()) @id
-  album           Int
-  user            Int
   photo           Bytes
 
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
+
+  albumId         Int
+  album           Album @relation(fields: [albumId], references: [id])
+
+  userId          Int
+  user            User @relation(fields: [userId], references: [id])
+
+  @@map("photos")
 }
 
