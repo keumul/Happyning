@@ -11,6 +11,7 @@ async function start() {
       whitelist: true,
     }),
   );
+
   await app.listen(PORT, () => {
     console.log(`START: Server started on ${PORT} port!`);
   });

@@ -9,7 +9,6 @@ import {
 } from "@nestjs/common";
 import { EventService } from "./event.service";
 import { EventDto } from "./dto/event.dto";
-import { EventIdDto } from "./dto/eventId.dto";
 
 @Controller("api/events")
 export class EventController {

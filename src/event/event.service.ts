@@ -1,8 +1,7 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { EventDto } from "./dto/event.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { EventIdDto } from "./dto/eventId.dto";
 
 @Injectable()
 export class EventService {
@@ -19,14 +18,15 @@ export class EventService {
           isPublic: dto.isPublic,
           location: dto.location,
           organizerId: +dto.organizerId,
-          categoryId: +dto.categoryId,
+          categoryId: +dto.categoryId
         },
       });
+      
       return event;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === "P2003") {
-          throw new ForbiddenException("Refer to non-existent data");
+          throw new NotFoundException("Refer to non-existent data");
         }
       }
     }
@@ -49,7 +49,7 @@ export class EventService {
     });
 
     if (!event) {
-      throw new ForbiddenException("Event does not exist");
+      throw new NotFoundException("Event does not exist");
     }
     return event;
   }
@@ -79,7 +79,6 @@ export class EventService {
   }
 
   async removeEvent(id: number) {
-
     try {
       const event = await this.prisma.event.delete({
         where: {
@@ -88,23 +87,7 @@ export class EventService {
       });
       return event;
     } catch (error) {
-      throw new ForbiddenException("Event does not exist", error);
+      throw new NotFoundException("Event does not exist", error);
     }
-
-    // const event = await this.prisma.event.findFirst({
-    //   where: {
-    //     id: +id,
-    //   },
-    // });
-    // if (!event) {
-    //   throw new ForbiddenException("Event does not exist");
-    // } else {
-    //   await this.prisma.event.delete({
-    //     where: {
-    //       id: +id,
-    //     },
-    //   });
-    //   return event;
-    // }
   }
 }
