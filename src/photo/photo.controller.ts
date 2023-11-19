@@ -3,7 +3,7 @@ import { PhotoService } from './photo.service';
 import { PhotoDto } from './dto/photo.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-@Controller('photos')
+@Controller('api/photos')
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) { }
 

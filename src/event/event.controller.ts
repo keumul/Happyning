@@ -1,22 +1,19 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from "@nestjs/common";
 import { EventService } from "./event.service";
 import { EventDto } from "./dto/event.dto";
+import { GetUser } from "src/auth/decorator";
+import { User } from "@prisma/client";
+import { RateDto } from "src/user/dto/rate.dto";
+import { JwtGuard } from "src/auth/guard";
 
+@UseGuards(JwtGuard)
 @Controller("api/events")
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Post()
-  createEvent(@Body() eventDto: EventDto) {
-    return this.eventService.createEvent(eventDto);
+  createEvent(@Body() eventDto: EventDto, @GetUser() user: User) {
+    return this.eventService.createEvent(eventDto, user);
   }
 
   @Get()
@@ -30,12 +27,27 @@ export class EventController {
   }
 
   @Patch(":id")
-  updateEvent(@Param("id") id: string, @Body() dto: EventDto) {
-    return this.eventService.updateEvent(+id, dto);
+  updateEvent(@Param("id") id: string, @Body() dto: EventDto, @GetUser() user: User) {
+    return this.eventService.updateEvent(+id, dto, user);
   }
 
   @Delete(":id")
   removeEvent(@Param("id") id: string) {
     return this.eventService.removeEvent(+id);
+  }
+
+  @Post("rate/:id")
+  rateEvent(@Param() param: any, @Body() dto: RateDto, @GetUser() user: User) {
+    return this.eventService.rateEvent(param.id, dto, user);
+  }
+
+  @Get("rate/:id")
+  viewEventRate(@Param() param: any) {
+    return this.eventService.viewEventRate(param.id);
+  }
+
+  @Delete("rate/:id")
+  removeEventRate(@Param() param: any, @GetUser() user: User) {
+    return this.eventService.removeEventRate(param.id, user);
   }
 }

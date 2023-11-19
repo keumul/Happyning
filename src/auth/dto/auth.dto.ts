@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class AuthDto {
   @IsString()
@@ -15,4 +15,6 @@ export class AuthDto {
 
   @IsNotEmpty()
   bday: Date;
+
+  isAdmin: Boolean;
 }

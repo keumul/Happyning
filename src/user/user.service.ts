@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RateDto } from './dto/rate.dto';
 
 @Injectable()
 export class UserService {
@@ -10,8 +11,10 @@ export class UserService {
   async findAllUsers() {
     try {
       const users = await this.prisma.user.findMany();
+      console.log(users);
+      
       return users;
-    } catch (error){
+    } catch (error) {
       throw new ForbiddenException("Something went wrong", error);
     }
   }
@@ -57,6 +60,62 @@ export class UserService {
         }
       })
       return user;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async rateUser(id: number, dto: RateDto, user) {
+    try {
+      const rate = await this.prisma.userRating.create({
+        data: {
+          message: dto.message,
+          rate: dto.rate,
+          rater: { connect: { id: user.id } },
+          rated: { connect: { id: +id } },
+        }
+      })
+      return rate;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async findCurrentUserRate(user) {
+    try {
+      const rate = await this.prisma.userRating.findMany({
+        where: {
+          ratedId: +user.id
+        }
+      })
+      return rate;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async viewUserRate(id: number) {
+    try {
+      const rate = await this.prisma.userRating.findMany({
+        where: {
+          ratedId: +id
+        }
+      })
+      return rate;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async removeUserRate(id: number, user) {
+    try {
+      const rate = await this.prisma.userRating.deleteMany({
+        where: {
+          raterId: +user.id,
+          ratedId: +id
+        }
+      })
+      return rate;
     } catch (error) {
       throw new NotFoundException("User does not exist", error);
     }

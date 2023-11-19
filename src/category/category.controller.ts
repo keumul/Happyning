@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/commo
 import { CategoryService } from "./category.service";
 import { CategoryDto } from "./dto/category.dto";
 
-@Controller("categories")
+@Controller("api/categories")
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -22,10 +22,7 @@ export class CategoryController {
   }
 
   @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() dto: CategoryDto,
-  ) {
+  update( @Param("id") id: string, @Body() dto: CategoryDto ) {
     return this.categoryService.updateCategory(+id, dto);
   }
 

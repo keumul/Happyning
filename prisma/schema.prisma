@@ -8,166 +8,166 @@ datasource db {
 }
 
 model User {
-  id              Int      @default(autoincrement()) @id 
-  username        String   @unique
-  password        String 
-  surname         String? 
-  bday            DateTime @db.Date
-  email           String   @unique
-  isAdmin         Boolean? @default(false)
+  id       Int       @id @default(autoincrement())
+  username String    @unique
+  password String
+  surname  String?
+  bday     DateTime  @db.Date
+  email    String    @unique
+  isAdmin  Boolean?  @default(false)
 
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 
-  event               Event[]
-  photo               Photo[]
-  eventRating         EventRating[]
-  eventRegistrations  EventRegistrations[]
-  raterUser           UserRating[] @relation("RaterRelation")
-  ratedUser           UserRating[] @relation("RatedRelation")
+  event              Event[]
+  photo              Photo[]
+  eventRating        EventRating[]
+  eventRegistrations EventRegistrations[]
+  raterUser          UserRating[]         @relation("RaterRelation")
+  ratedUser          UserRating[]         @relation("RatedRelation")
+  notification       Notification[]
+  message            Message[]
 
   @@map("users")
 }
 
 model Event {
-  id              Int      @default(autoincrement()) @id   
-  title           String
-  startDate       DateTime
-  description     String?
-  maxGuestAmount  Int?     
-  isPublic        Boolean? @default(false)
-  location        String
-  
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  title          String
+  startDate      DateTime
+  description    String?
+  maxGuestAmount Int?
+  isPublic       Boolean? @default(false)
+  location       String
 
-  organizerId     Int
-  organizer       User @relation(fields: [organizerId], references: [id])
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
 
-  categoryId      Int
-  category        Category @relation(fields: [categoryId], references: [id])
-  
+  organizerId    Int
+  organizer      User @relation(fields: [organizerId], references: [id])
 
-  eventRating         EventRating[]
-  eventRegistrations  EventRegistrations[]
-  chat                Chat[]
-  notification        Notification[]
-  album               Album[]
+  categoryId     Int
+  category       Category @relation(fields: [categoryId], references: [id])
+
+  eventRating        EventRating[]
+  eventRegistrations EventRegistrations[]
+  notification       Notification[]
+  album              Album[]
+  message            Message[]
 
   @@map("events")
 }
 
 model EventRating {
-  id              Int      @default(autoincrement()) @id
-  message         String?
-  rate            Float    @default(0.0)
+  id        Int     @id @default(autoincrement())
+  message   String?
+  rate      Float   @default(0.0)
 
-  eventId         Int
-  event           Event @relation(fields: [eventId], references: [id])
+  eventId   Int
+  event     Event @relation(fields: [eventId], references: [id])
 
-  userId          Int
-  user            User @relation(fields: [userId], references: [id])
+  userId    Int
+  user      User @relation(fields: [userId], references: [id])
 
-  @@map("events_rating") 
+  @@map("events_rating")
 }
 
 model UserRating {
-  id              Int      @default(autoincrement()) @id
-  message         String?
-  rate            Float    @default(5.0)
+  id          Int     @id @default(autoincrement())
+  message     String?
+  rate        Float   @default(5.0)
 
-  raterId          Int
-  rater            User @relation(name: "RaterRelation", fields: [raterId], references: [id])
+  raterId     Int
+  rater       User @relation(name: "RaterRelation", fields: [raterId], references: [id])
 
-  ratedId          Int
-  rated            User @relation(name: "RatedRelation", fields: [ratedId], references: [id])
+  ratedId     Int
+  rated       User @relation(name: "RatedRelation", fields: [ratedId], references: [id])
 
   @@map("users_rating")
 }
 
 model EventRegistrations {
-  id              Int      @default(autoincrement()) @id
-  guestAmount     Int      @default(0)
+  id          Int @id @default(autoincrement())
+  guestAmount Int @default(0)
 
-  eventId         Int
-  event           Event @relation(fields: [eventId], references: [id])
+  createdAt   DateTime @default(now())
 
-  userId          Int
-  user            User @relation(fields: [userId], references: [id])
+  eventId     Int
+  event       Event @relation(fields: [eventId], references: [id])
+
+  userId      Int
+  user        User @relation(fields: [userId], references: [id])
 
   @@map("events_registrations")
 }
 
-
 model Message {
-  id              Int      @default(autoincrement()) @id
-  chat            Int
-  user            Int
-  message         String
+  id          Int    @id @default(autoincrement())
+  message     String
 
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @updatedAt
+
+  eventId     Int
+  event       Event @relation(fields: [eventId], references: [id])
+
+  userId      Int
+  user        User @relation(fields: [userId], references: [id])
 
   @@map("messages")
 }
 
-model Chat {
-  id              Int      @default(autoincrement()) @id
-
-  eventId         Int
-  event           Event @relation(fields: [eventId], references: [id])
-
-  @@map("chats")
-}
-
 model Notification {
-  id              Int      @default(autoincrement()) @id
-  message         String
+  id          Int      @id @default(autoincrement())
+  message     String
+  isRead      Boolean? @default(false)
 
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @updatedAt
 
-  eventId         Int
-  event           Event @relation(fields: [eventId], references: [id])
+  userId      Int
+  user        User @relation(fields: [userId], references: [id])
+
+  eventId     Int
+  event       Event @relation(fields: [eventId], references: [id])
 
   @@map("notifications")
 }
 
 model Category {
-  id              Int      @default(autoincrement()) @id
-  title           String
-  description     String?
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
 
-  event           Event[]
+  event       Event[]
 
   @@map("categories")
 }
 
 model Album {
-  id              Int      @default(autoincrement()) @id
-  title           String
+  id          Int    @id @default(autoincrement())
+  title       String
 
-  eventId         Int
-  event           Event @relation(fields: [eventId], references: [id])
+  eventId     Int
+  event       Event @relation(fields: [eventId], references: [id])
 
-  photo           Photo[]
+  photo       Photo[]
 
   @@map("albums")
 }
 
 model Photo {
-  id              Int      @default(autoincrement()) @id
-  photo           Bytes
+  id            Int   @id @default(autoincrement())
+  photo         Bytes
 
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
 
-  albumId         Int
-  album           Album @relation(fields: [albumId], references: [id])
+  albumId       Int
+  album         Album @relation(fields: [albumId], references: [id])
 
-  userId          Int
-  user            User @relation(fields: [userId], references: [id])
+  userId        Int
+  user          User @relation(fields: [userId], references: [id])
 
   @@map("photos")
 }
-

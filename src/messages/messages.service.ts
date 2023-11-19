@@ -26,12 +26,12 @@ export class MessageService {
 		});
 	}
 
-	async create(chatId: number, userId: number, dto: MessageDto) {
+	async create(chatId: number, user, dto: MessageDto) {
 		return await this.prisma.message.create({
 			data: {
 				message: dto.content,
 				eventId: chatId,
-				userId: userId
+				userId: user.id
 			}
 		});
 	}

@@ -20,8 +20,5 @@ export class EventDto {
   location: string;
 
   @IsNotEmpty()
-  organizerId: number;
-
-  @IsNotEmpty()
   categoryId: number;
 }

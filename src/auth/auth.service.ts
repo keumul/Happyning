@@ -24,9 +24,10 @@ export class AuthService {
           email: dto.email,
           password: hashedPassword,
           bday: dto.bday,
+          isAdmin: dto.isAdmin as boolean,
         },
       });
-
+      console.log(newUser);
       return this.signToken(newUser.id, newUser.username, newUser.isAdmin);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
