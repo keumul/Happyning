@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { GetUser } from "src/auth/decorator";
-import { AdminGuard, JwtGuard } from "src/auth/guard";
+import { AdminGuard, JwtGuard, UserGuard } from "src/auth/guard";
 import { UserService } from "./user.service";
 import { UserDto } from "./dto/user.dto";
 import { RateDto } from "./dto/rate.dto";
@@ -29,6 +29,7 @@ export class UserController {
   }
 
   @Patch(":id")
+  @UseGuards(UserGuard)
   updateUser(@Param('id') id: string, @Body() dto: UserDto) {
     return this.userService.updateUser(+id, dto);
   }
@@ -39,11 +40,13 @@ export class UserController {
   }
 
   @Post("rate/:id")
+  @UseGuards(UserGuard)
   rateUser(@Param() param: any, @Body() dto: RateDto, @GetUser() user: User) {
     return this.userService.rateUser(param.id, dto, user);
   }
 
   @Get("myrate")
+  @UseGuards(UserGuard)
   findCurrentUserRate(@GetUser() user: User) {
     return this.userService.findCurrentUserRate(user);
   }
@@ -53,8 +56,8 @@ export class UserController {
     return this.userService.viewUserRate(param.id);
   }
 
-  //delete rate
   @Delete("rate/:id")
+  @UseGuards(UserGuard)
   removeUserRate(@Param() param: any, @GetUser() user: User) {
     return this.userService.removeUserRate(param.id, user);
   }

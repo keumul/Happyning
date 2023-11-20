@@ -12,12 +12,13 @@ import { AlbumModule } from './album/album.module';
 import { PhotoModule } from './photo/photo.module';
 import { UserModule } from './user/user.module';
 import { ParticipantModule } from './participant/participant.module';
+import { QrCodeModule } from './qrcode/qrcode.module';
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
     AuthModule,
     PrismaModule,
-    ConfigModule.forRoot({ isGlobal: true }),
     EventModule,
     CategoryModule,
     MessagesModule,
@@ -27,6 +28,9 @@ import { ParticipantModule } from './participant/participant.module';
     PhotoModule,
     UserModule,
     ParticipantModule,
+    QrCodeModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot()
   ],
   providers: [AppService],
 })

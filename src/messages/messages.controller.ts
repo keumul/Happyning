@@ -13,8 +13,7 @@ export class MessageController {
 	}
 
 	@Post()
-	async create( @Param('id') chatId: number, @GetUser() user: number, @Body() dto: MessageDto
-	) {
+	async create( @Param('id') chatId: number, @GetUser() user: number, @Body() dto: MessageDto) {
 		return await this.messageService.create(+chatId, user, dto)
 	}
 }

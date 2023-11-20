@@ -2,16 +2,19 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { ParticipantDto } from './dto/participant.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { QrCodeService } from 'src/qrcode/qrcode.service';
 
 //TODO: (странно) создание не работает без декоратора @IsNotEmpty у поля eventId/userId в dto 
 //TODO: remove костыльный
 @Injectable()
 export class ParticipantService {
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+              private readonly qrCodeService: QrCodeService,) {}
 
   async addParticipant(dto: ParticipantDto, user) {
     try {
+      
       const guestAmount = await this.prisma.eventRegistrations.findMany({
         where: {
           eventId: +dto.eventId
@@ -27,6 +30,9 @@ export class ParticipantService {
           userId: user.id
         }
       });
+
+      await this.sendQrCodeNotification(user.id, +dto.eventId);
+
       return participant;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -34,6 +40,35 @@ export class ParticipantService {
           throw new NotFoundException("Refer to non-existent data");
         }
       }
+    }
+  }
+
+  private async sendQrCodeNotification(userId: number, eventId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      const event = await this.prisma.event.findUnique({
+        where: { id: eventId },
+      });
+
+      if (!user || !event) {
+        throw new Error('User or event not found');
+      }
+      
+      const qrCodeImage = await this.qrCodeService.generateQrCode(event.id.toString());
+      await this.prisma.notification.create({
+        data: {
+          message: 'Your QR Code for the upcoming event',
+          userId: user.id,
+          eventId: event.id,
+          isRead: false,
+          qrCode: qrCodeImage,
+        },
+      });
+    } catch (error) {
+      throw new Error(`Failed to send QR code notification: ${error.message}`);
     }
   }
 
@@ -106,5 +141,7 @@ export class ParticipantService {
       throw new ForbiddenException("Something went wrong", error);
     }
   }
+
+  
   
 }

@@ -3,8 +3,6 @@ import { EventDto } from "./dto/event.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { RateDto } from "src/user/dto/rate.dto";
-import { use } from "passport";
-
 
 @Injectable()
 export class EventService {
