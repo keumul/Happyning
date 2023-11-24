@@ -4,6 +4,7 @@ import { ParticipantDto } from './dto/participant.dto';
 import { JwtGuard, UserGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
+import { RemoveParticipantDto } from './dto/participant-remove.dto';
 
 @UseGuards(JwtGuard)
 @Controller('api/participants')
@@ -22,15 +23,21 @@ export class ParticipantController {
     return this.participantService.findAllEventParticipants(event.id);
   }
 
-  @Get('user/:id')
+  @Get('event/user/:id')
   @UseGuards(UserGuard)
   findEventParticipant(@Param() event: any, @Body() dto: ParticipantDto) {
     return this.participantService.findEventParticipant(event.id, dto);
   }
 
+  @Get('all/user/:id')
+  @UseGuards(UserGuard)
+  findUserEvents(@Param() user: any) {
+    return this.participantService.findUserEvents(user.id);
+  }
+
   @Delete(':id')
   @UseGuards(UserGuard)
-  removeEventParticipant(@Param() event: any, @Body() dto: ParticipantDto) {
-    return this.participantService.removeEventParticipant(event.id, dto);
+  removeEventParticipant(@Param() event: any, @GetUser() user: User) {
+    return this.participantService.removeEventParticipant(event.id, user);
   }
 }

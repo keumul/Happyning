@@ -11,6 +11,7 @@ export class EventDto {
   @IsString()
   description: string;
 
+  @IsNotEmpty()
   maxGuestAmount: number;
 
   isPublic: boolean;

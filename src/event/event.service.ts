@@ -42,6 +42,19 @@ export class EventService {
     }
   }
 
+  async findUserEvents(id: number) {
+    try {
+      const events = await this.prisma.event.findMany({
+        where: {
+          organizerId: +id,
+        },
+      });
+      return events;
+    } catch (error) {
+      throw new ForbiddenException("Something went wrong", error);
+    }
+  }
+
   async findEvent(id: number) {
     const event = await this.prisma.event.findFirst({
       where: {

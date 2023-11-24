@@ -22,6 +22,11 @@ export class EventController {
     return this.eventService.findAllEvents();
   }
 
+  @Get("user/:id")
+  findUserEvents(@Param() params: any) {
+    return this.eventService.findUserEvents(params.id);
+  }
+
   @Get(":id")
   findEvent(@Param() params: any) {
     return this.eventService.findEvent(params.id);
