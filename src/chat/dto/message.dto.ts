@@ -5,12 +5,12 @@ export class MessageDto {
     chat: number;
 
     @IsNotEmpty()
-    user: number;
+    user: {
+        id: number;
+        username: string;
+    };
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(1, {
-        message: 'Message must be at least 1 characters long'
-    })
-    content: string;
+    message: string;
 }

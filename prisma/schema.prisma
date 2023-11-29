@@ -37,7 +37,8 @@ model Event {
   startDate      DateTime
   description    String?
   maxGuestAmount Int?
-  isPublic       Boolean? @default(false)
+  isPublic       Boolean
+  secretCode     String?
   location       String
 
   createdAt      DateTime @default(now())
@@ -75,7 +76,7 @@ model EventRating {
 model UserRating {
   id          Int     @id @default(autoincrement())
   message     String?
-  rate        Float   @default(5.0)
+  rate        Int
 
   raterId     Int
   rater       User @relation(name: "RaterRelation", fields: [raterId], references: [id])

@@ -1,8 +1,11 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 
 export class EventDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(20, {
+		message: 'Too long title'
+	})
   title: string;
 
   @IsNotEmpty()
@@ -14,6 +17,7 @@ export class EventDto {
   @IsNotEmpty()
   maxGuestAmount: number;
 
+  @IsNotEmpty()
   isPublic: boolean;
 
   @IsString()
@@ -22,4 +26,7 @@ export class EventDto {
 
   @IsNotEmpty()
   categoryId: number;
+
+  @IsString()
+  secretCode: string;
 }

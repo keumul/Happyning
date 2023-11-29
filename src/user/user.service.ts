@@ -67,16 +67,19 @@ export class UserService {
 
   async rateUser(id: number, dto: RateDto, user) {
     try {
-      const rate = await this.prisma.userRating.create({
+
+      const rateuser = await this.prisma.userRating.create({
         data: {
           message: dto.message,
-          rate: dto.rate,
           rater: { connect: { id: user.id } },
           rated: { connect: { id: +id } },
+          rate: +dto.rate,
         }
       })
-      return rate;
+      return rateuser;
     } catch (error) {
+      console.log(error);
+      
       throw new NotFoundException("User does not exist", error);
     }
   }

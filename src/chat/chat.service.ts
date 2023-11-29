@@ -9,9 +9,9 @@ export class ChatService {
 	async create(dto: MessageDto) {
 		const newMessage = await this.prisma.message.create({
 			data: {
-				message: dto.content,
+				message: dto.message,
 				eventId: +dto.chat,
-				userId: +dto.user
+				userId: +dto.user.id,
 			}
 		});
 
@@ -24,6 +24,7 @@ export class ChatService {
 				createdAt: true,
 				user: {
 					select: {
+						id: true,
 						username: true
 					}
 				}
@@ -41,6 +42,7 @@ export class ChatService {
 				createdAt: true,
 				user: {
 					select: {
+						id: true,
 						username: true
 					}
 				}

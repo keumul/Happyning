@@ -3,6 +3,7 @@ import { EventDto } from "./dto/event.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { RateDto } from "src/user/dto/rate.dto";
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class EventService {
@@ -10,19 +11,25 @@ export class EventService {
 
   async createEvent(dto: EventDto, user) {
     try {
+
+      const startDateInMinsk = moment.tz(dto.startDate, 'Europe/Minsk').toDate();
+      if (startDateInMinsk < new Date()) {
+        throw new ForbiddenException("You can't create an event in the past");
+      }
       const event = await this.prisma.event.create({
         data: {
           title: dto.title,
-          startDate: dto.startDate,
+          startDate: startDateInMinsk,
           description: dto.description,
           maxGuestAmount: +dto.maxGuestAmount,
-          isPublic: dto.isPublic,
+          isPublic: Boolean(dto.isPublic),
           location: dto.location,
           organizerId: user.id,
-          categoryId: +dto.categoryId
+          categoryId: +dto.categoryId,
+          secretCode: dto.secretCode,
         },
       });
-      
+
       return event;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -70,19 +77,26 @@ export class EventService {
 
   async updateEvent(id: number, dto: EventDto, user) {
     try {
+
+      const startDateInMinsk = moment.tz(dto.startDate, 'Europe/Minsk').toDate();
+      if (startDateInMinsk < new Date()) {
+        throw new ForbiddenException("You can't create an event in the past");
+      }
+
       const event = await this.prisma.event.update({
         where: {
           id: +id,
         },
         data: {
           title: dto.title,
-          startDate: dto.startDate,
+          startDate: startDateInMinsk,
           description: dto.description,
           maxGuestAmount: +dto.maxGuestAmount,
           isPublic: dto.isPublic,
           location: dto.location,
           organizerId: user.id,
           categoryId: +dto.categoryId,
+          secretCode: dto.secretCode,
         },
       });
 
@@ -106,7 +120,7 @@ export class EventService {
   }
 
   async rateEvent(id: number, dto: RateDto, user) {
-    try {      
+    try {
       const rate = await this.prisma.eventRating.create({
         data: {
           message: dto.message,
