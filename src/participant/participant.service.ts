@@ -3,15 +3,12 @@ import { ParticipantDto } from './dto/participant.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { QrCodeService } from 'src/qrcode/qrcode.service';
-import { RemoveParticipantDto } from './dto/participant-remove.dto';
 
-//TODO: (странно) создание не работает без декоратора @IsNotEmpty у поля eventId/userId в dto 
-//TODO: remove костыльный
 @Injectable()
 export class ParticipantService {
 
   constructor(private readonly prisma: PrismaService,
-              private readonly qrCodeService: QrCodeService,) {}
+    private readonly qrCodeService: QrCodeService) { }
 
   async addParticipant(dto: ParticipantDto, user) {
     const participant = await this.prisma.eventRegistrations.findFirst({
@@ -26,7 +23,7 @@ export class ParticipantService {
     }
 
     try {
-      
+
       const guestAmount = await this.prisma.eventRegistrations.findMany({
         where: {
           eventId: +dto.eventId
@@ -42,7 +39,6 @@ export class ParticipantService {
           userId: user.id
         }
       });
-
       await this.sendQrCodeNotification(user.id, +dto.eventId);
 
       return participant;
@@ -68,11 +64,25 @@ export class ParticipantService {
       if (!user || !event) {
         throw new Error('User or event not found');
       }
-      
-      const qrCodeImage = await this.qrCodeService.generateQrCode(event.id.toString());
+
+      const participant = await this.prisma.eventRegistrations.findFirst({
+        where: {
+          eventId: event.id,
+          userId: user.id
+        },
+        include: {
+          event: {
+            select: {
+              title: true
+            }
+          }
+        }
+      });
+
+      const qrCodeImage = await this.qrCodeService.generateQrCode(JSON.stringify(participant));
       await this.prisma.notification.create({
         data: {
-          message: 'Your QR Code for the upcoming event',
+          message: 'QR-код для подтверждения регистрации на мероприятие готов',
           userId: user.id,
           eventId: event.id,
           isRead: false,
@@ -116,12 +126,6 @@ export class ParticipantService {
   }
 
   async findUserEvents(userId: number) {
-    const createdEvents = await this.prisma.event.findMany({
-      where: {
-        organizerId: +userId,
-      },
-    });
-
     const participantEvents = await this.prisma.eventRegistrations.findMany({
       where: {
         userId: +userId,
@@ -131,13 +135,10 @@ export class ParticipantService {
       },
     });
 
-    return {
-      createdEvents,
-      participantEvents,
-    };
+    return participantEvents;
   }
 
-  
+
   async removeEventParticipant(eventId: number, user) {
     try {
 
@@ -169,34 +170,9 @@ export class ParticipantService {
       });
 
       return deletedEventRegistration;
-      // await this.prisma.eventRegistrations.delete({
-      //   where: {
-      //     id: dto.userId
-      //   },
-      // });
-
-      // const lastEventRegistration = await this.prisma.eventRegistrations.findFirst({
-      //   where: {
-      //     eventId: +dto.eventId
-      //   },
-      //   orderBy: {
-      //     createdAt: 'desc'
-      //   }
-      // });
-      
-      // const updatedEventRegistration = await this.prisma.eventRegistrations.update({
-      //   where: {
-      //     id: lastEventRegistration.id
-      //   },
-      //   data: {
-      //     guestAmount: lastEventRegistration.guestAmount - 1
-      //   }
-      // });
-  
-    //  return updatedEventRegistration;
     } catch (error) {
       console.log(error);
-      
+
       throw new ForbiddenException("Something went wrong", error);
     }
   }

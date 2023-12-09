@@ -6,4 +6,5 @@ export class MessageDto {
 		message: 'Message must be at least 1 characters long'
 	})
 	content: string;
+	latency: number;
 }

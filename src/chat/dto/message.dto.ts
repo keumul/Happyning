@@ -13,4 +13,6 @@ export class MessageDto {
     @IsNotEmpty()
     @IsString()
     message: string;
+
+    latency: number;
 }

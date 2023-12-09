@@ -18,7 +18,6 @@ export class ParticipantController {
   }
 
   @Get(':id')
-  @UseGuards(UserGuard)
   findAllEventParticipants(@Param() event: any) {
     return this.participantService.findAllEventParticipants(event.id);
   }

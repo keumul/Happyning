@@ -12,6 +12,7 @@ export class ChatService {
 				message: dto.message,
 				eventId: +dto.chat,
 				userId: +dto.user.id,
+				latency: +dto.latency
 			}
 		});
 
@@ -27,7 +28,8 @@ export class ChatService {
 						id: true,
 						username: true
 					}
-				}
+				},
+				latency: true
 			}
 		});
 	}
@@ -45,7 +47,8 @@ export class ChatService {
 						id: true,
 						username: true
 					}
-				}
+				},
+				latency: true
 			},
 			orderBy: {
 				createdAt: 'asc'

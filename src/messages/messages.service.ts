@@ -18,7 +18,8 @@ export class MessageService {
 					select: {
 						username: true
 					}
-				}
+				},
+				latency: true
 			},
 			orderBy: {
 				createdAt: 'asc'
@@ -31,7 +32,8 @@ export class MessageService {
 			data: {
 				message: dto.content,
 				eventId: chatId,
-				userId: user.id
+				userId: user.id,
+				latency: dto.latency
 			}
 		});
 	}

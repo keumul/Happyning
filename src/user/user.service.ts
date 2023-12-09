@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RateDto } from './dto/rate.dto';
+import * as argon from "argon2";
 
 @Injectable()
 export class UserService {
@@ -11,8 +12,6 @@ export class UserService {
   async findAllUsers() {
     try {
       const users = await this.prisma.user.findMany();
-      console.log(users);
-      
       return users;
     } catch (error) {
       throw new ForbiddenException("Something went wrong", error);
@@ -35,6 +34,7 @@ export class UserService {
 
   async updateUser(id: number, dto: UserDto) {
     try {
+      const hashedPassword = await argon.hash(dto.password);
       const user = await this.prisma.user.update({
         where: {
           id: +id
@@ -42,7 +42,7 @@ export class UserService {
         data: {
           username: dto.username,
           email: dto.email,
-          password: dto.password,
+          password: hashedPassword,
           bday: dto.bday,
         }
       })
@@ -76,6 +76,16 @@ export class UserService {
           rate: +dto.rate,
         }
       })
+
+      await this.prisma.notification.create({
+        data: {
+          message: 'Вы были оценены пользователем ' + user.username + ' на оценку ' + dto.rate,
+          userId: +id,
+          eventId: +id,
+          isRead: false,
+        },
+      });
+
       return rateuser;
     } catch (error) {
       console.log(error);
@@ -94,6 +104,15 @@ export class UserService {
       return rate;
     } catch (error) {
       throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async findAllUserRates() {
+    try {
+      const rate = await this.prisma.userRating.findMany()
+      return rate;
+    } catch (error) {
+      throw new NotFoundException("Something wrong!", error);
     }
   }
 

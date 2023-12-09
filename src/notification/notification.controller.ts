@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { NotificationDto } from './dto/notification.dto';
 
@@ -11,18 +11,13 @@ export class NotificationController {
     return this.notificationService.createNotification(dto);
   }
 
-  @Get()
-  findAllNotifications() {
-    return this.notificationService.findAllNotifications();
+  @Get('user/:id')
+  findAllUserNotifications(@Param('id') id: number) {
+    return this.notificationService.findAllUserNotifications(+id);
   }
 
   @Get(':id')
-  pickNotification(@Param('id') id: string) {
+  pickNotification(@Param('id') id: number) {
     return this.notificationService.pickNotification(+id);
-  }
-
-  @Get(':id')
-  revertNotification(@Param('id') id: string) {
-    return this.notificationService.revertNotification(+id);
   }
 }

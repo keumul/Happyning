@@ -30,6 +30,14 @@ export class EventService {
         },
       });
 
+      await this.prisma.notification.create({
+        data: {
+          message: 'Мероприятие успешно создано',
+          userId: user.id,
+          eventId: event.id,
+          isRead: false,
+        },
+      });
       return event;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

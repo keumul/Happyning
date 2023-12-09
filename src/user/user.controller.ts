@@ -45,6 +45,12 @@ export class UserController {
     return this.userService.rateUser(param.id, dto, user);
   }
 
+  @Get("rates")
+  @UseGuards(AdminGuard)
+  findAllUserRates() {
+    return this.userService.findAllUserRates();
+  }
+
   @Get("myrate")
   @UseGuards(UserGuard)
   findCurrentUserRate(@GetUser() user: User) {

@@ -105,6 +105,7 @@ model EventRegistrations {
 model Message {
   id          Int    @id @default(autoincrement())
   message     String
+  latency     Int    
 
   createdAt   DateTime @default(now())
   updateAt    DateTime @updatedAt
