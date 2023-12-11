@@ -20,8 +20,6 @@ model User {
   updateAt  DateTime @updatedAt
 
   event              Event[]
-  photo              Photo[]
-  eventRating        EventRating[]
   eventRegistrations EventRegistrations[]
   raterUser          UserRating[]         @relation("RaterRelation")
   ratedUser          UserRating[]         @relation("RatedRelation")
@@ -50,27 +48,11 @@ model Event {
   categoryId     Int
   category       Category @relation(fields: [categoryId], references: [id])
 
-  eventRating        EventRating[]
   eventRegistrations EventRegistrations[]
   notification       Notification[]
-  album              Album[]
   message            Message[]
 
   @@map("events")
-}
-
-model EventRating {
-  id        Int     @id @default(autoincrement())
-  message   String?
-  rate      Float   @default(0.0)
-
-  eventId   Int
-  event     Event @relation(fields: [eventId], references: [id])
-
-  userId    Int
-  user      User @relation(fields: [userId], references: [id])
-
-  @@map("events_rating")
 }
 
 model UserRating {
@@ -147,30 +129,3 @@ model Category {
   @@map("categories")
 }
 
-model Album {
-  id          Int    @id @default(autoincrement())
-  title       String
-
-  eventId     Int
-  event       Event @relation(fields: [eventId], references: [id])
-
-  photo       Photo[]
-
-  @@map("albums")
-}
-
-model Photo {
-  id            Int   @id @default(autoincrement())
-  photo         Bytes
-
-  createdAt     DateTime @default(now())
-  updateAt      DateTime @updatedAt
-
-  albumId       Int
-  album         Album @relation(fields: [albumId], references: [id])
-
-  userId        Int
-  user          User @relation(fields: [userId], references: [id])
-
-  @@map("photos")
-}

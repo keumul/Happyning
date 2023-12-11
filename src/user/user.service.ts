@@ -48,7 +48,11 @@ export class UserService {
       })
       return user;
     } catch (error) {
-      throw new NotFoundException("User does not exist", error);
+      if(error.code === 'P2002') {
+        throw new ForbiddenException("Имя и почта должны быть уникальными", error);
+      } else {
+      throw new NotFoundException("Что-то пошло не так", error);
+      }
     }
   }
 
