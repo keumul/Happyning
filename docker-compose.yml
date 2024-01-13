@@ -8,3 +8,20 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: 1111
       POSTGRES_DB: nest
+    networks:
+      - mynetwork
+  
+  happyning:
+    image: happyning:latest
+    ports:
+      - 5000:5000
+      - 5001:5001
+    environment:
+      DATABASE_URL: postgresql://root:1111@dev-db:5432/nest?schema=public
+    networks:
+      - mynetwork
+
+
+networks:
+  mynetwork:
+    name: mynetwork

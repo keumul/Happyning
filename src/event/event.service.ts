@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/commo
 import { EventDto } from "./dto/event.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { RateDto } from "src/user/dto/rate.dto";
 import * as moment from 'moment-timezone';
 
 @Injectable()
@@ -78,7 +77,7 @@ export class EventService {
     });
 
     if (!event) {
-      throw new NotFoundException("Event does not exist");
+      throw new NotFoundException("Something went wrong");
     }
     return event;
   }
@@ -123,7 +122,7 @@ export class EventService {
       });
       return event;
     } catch (error) {
-      throw new NotFoundException("Event does not exist", error);
+      throw new NotFoundException("Something went wrong", error);
     }
   }
 }

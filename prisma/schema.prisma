@@ -11,13 +11,11 @@ model User {
   id       Int       @id @default(autoincrement())
   username String    @unique
   password String
-  surname  String?
   bday     DateTime  @db.Date
   email    String    @unique
   isAdmin  Boolean?  @default(false)
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
 
   event              Event[]
   eventRegistrations EventRegistrations[]
@@ -40,13 +38,12 @@ model Event {
   location       String
 
   createdAt      DateTime @default(now())
-  updateAt       DateTime @updatedAt
 
   organizerId    Int
-  organizer      User @relation(fields: [organizerId], references: [id])
+  organizer      User @relation(fields: [organizerId], references: [id], onDelete: Cascade)
 
   categoryId     Int
-  category       Category @relation(fields: [categoryId], references: [id])
+  category       Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   eventRegistrations EventRegistrations[]
   notification       Notification[]
@@ -61,10 +58,10 @@ model UserRating {
   rate        Int
 
   raterId     Int
-  rater       User @relation(name: "RaterRelation", fields: [raterId], references: [id])
+  rater       User @relation(name: "RaterRelation", fields: [raterId], references: [id], onDelete: Cascade)
 
   ratedId     Int
-  rated       User @relation(name: "RatedRelation", fields: [ratedId], references: [id])
+  rated       User @relation(name: "RatedRelation", fields: [ratedId], references: [id], onDelete: Cascade)
 
   @@map("users_rating")
 }
@@ -76,10 +73,10 @@ model EventRegistrations {
   createdAt   DateTime @default(now())
 
   eventId     Int
-  event       Event @relation(fields: [eventId], references: [id])
+  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   userId      Int
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("events_registrations")
 }
@@ -90,13 +87,12 @@ model Message {
   latency     Int    
 
   createdAt   DateTime @default(now())
-  updateAt    DateTime @updatedAt
 
   eventId     Int
-  event       Event @relation(fields: [eventId], references: [id])
+  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   userId      Int
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
@@ -108,13 +104,12 @@ model Notification {
   qrCode      String?
 
   createdAt   DateTime @default(now())
-  updateAt    DateTime @updatedAt
 
   userId      Int
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   eventId     Int
-  event       Event @relation(fields: [eventId], references: [id])
+  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }

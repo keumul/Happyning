@@ -4,7 +4,6 @@ import { ParticipantDto } from './dto/participant.dto';
 import { JwtGuard, UserGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
-import { RemoveParticipantDto } from './dto/participant-remove.dto';
 
 @UseGuards(JwtGuard)
 @Controller('api/participants')
