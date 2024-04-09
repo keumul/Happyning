@@ -18,7 +18,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   findAllUsers() {
     return this.userService.findAllUsers();
   }
@@ -39,20 +39,20 @@ export class UserController {
     return this.userService.removeUser(+id);
   }
 
-  @Post("rate/:id")
-  @UseGuards(UserGuard)
-  rateUser(@Param() param: any, @Body() dto: RateDto, @GetUser() user: User) {
-    return this.userService.rateUser(param.id, dto, user);
+  @Post("rate/:userId/:eventId")
+  // @UseGuards(UserGuard)
+  rateUser(@Param() params: any, @Body() dto: RateDto, @GetUser() user: User) {
+    return this.userService.rateUser(params.userId, params.eventId, dto, user);
   }
 
   @Get("rates")
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   findAllUserRates() {
     return this.userService.findAllUserRates();
   }
 
   @Get("myrate")
-  @UseGuards(UserGuard)
+  // @UseGuards(UserGuard)
   findCurrentUserRate(@GetUser() user: User) {
     return this.userService.findCurrentUserRate(user);
   }
@@ -63,7 +63,7 @@ export class UserController {
   }
 
   @Delete("rate/:id")
-  @UseGuards(UserGuard)
+  // @UseGuards(UserGuard)
   removeUserRate(@Param() param: any, @GetUser() user: User) {
     return this.userService.removeUserRate(param.id, user);
   }

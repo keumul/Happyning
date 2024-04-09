@@ -7,6 +7,8 @@ export class RateDto {
     @IsNumber()
     @IsNotEmpty()
     rate: number
+
     raterId: number
     ratedId: number
+    eventId: number
 }

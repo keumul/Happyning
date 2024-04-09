@@ -11,6 +11,9 @@ export class EventDto {
   @IsNotEmpty()
   startDate: Date;
 
+  @IsNotEmpty()
+  endDate: Date;
+
   @IsString()
   description: string;
 
@@ -20,13 +23,18 @@ export class EventDto {
   @IsNotEmpty()
   isPublic: boolean;
 
-  @IsString()
   @IsNotEmpty()
-  location: string;
+  locationId: number;
 
   @IsNotEmpty()
   categoryId: number;
 
-  @IsString()
+  @IsNotEmpty()
+  formatId: number;
+
+  @IsNotEmpty()
   secretCode: string;
+
+  @IsNotEmpty()
+  ageLimit: number;
 }

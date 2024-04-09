@@ -8,7 +8,7 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   password: string;
-  email: string;
-  bday: Date;
-  isAdmin: Boolean;
+  @IsString()
+  @IsNotEmpty()
+  activationCode: string;
 }

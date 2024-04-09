@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  username String    @unique
-  password String
-  bday     DateTime  @db.Date
-  email    String    @unique
-  isAdmin  Boolean?  @default(false)
-
-  createdAt DateTime @default(now())
+  id             Int       @id @default(autoincrement())
+  username       String    @unique
+  password       String
+  bday           DateTime  @db.Date
+  email          String    @unique
+  role           String  
+  createdAt      DateTime  @default(now())
+  isConfirmed    Boolean
+  activationCode String?  @default(cuid())  //NEW
 
   event              Event[]
   eventRegistrations EventRegistrations[]
@@ -23,19 +24,63 @@ model User {
   ratedUser          UserRating[]         @relation("RatedRelation")
   notification       Notification[]
   message            Message[]
+  preference         Preference[]
+  confirmation       Confirmation[]
 
   @@map("users")
+}
+
+model Confirmation {
+  id           Int @id @default(autoincrement())
+  userId       Int
+  confirmValue String 
+  expiration   DateTime
+
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)  
+  
+  @@map("confirmations")
+}
+
+model Preference {
+  id               Int                 @id @default(autoincrement())
+  userId           Int
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferenceCategories PreferenceCategory[]
+  preferenceFormats    PreferenceFormat[]
+  
+  @@map("preferences")
+}
+
+model PreferenceCategory {
+  id           Int     @id @default(autoincrement())
+  preferenceId Int
+  categoryId   Int
+  preference   Preference @relation(fields: [preferenceId], references: [id], onDelete: Cascade)
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("preference_categories")
+}
+
+model PreferenceFormat {
+  id           Int     @id @default(autoincrement())
+  preferenceId Int
+  formatId     Int
+  preference   Preference @relation(fields: [preferenceId], references: [id], onDelete: Cascade)
+  format       Format     @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  @@map("preference_formats")
 }
 
 model Event {
   id             Int      @id @default(autoincrement())
   title          String
   startDate      DateTime
+  endDate        DateTime
   description    String?
   maxGuestAmount Int?
+  ageLimit       Int?
   isPublic       Boolean
   secretCode     String?
-  location       String
 
   createdAt      DateTime @default(now())
 
@@ -45,9 +90,18 @@ model Event {
   categoryId     Int
   category       Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  formatId      Int
+  format        Format @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  locationId   Int
+  location     Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
   eventRegistrations EventRegistrations[]
   notification       Notification[]
   message            Message[]
+  photo              Photo[]
+  eventComplaint     EventComplaint[]
+  userRating         UserRating[]
 
   @@map("events")
 }
@@ -62,6 +116,9 @@ model UserRating {
 
   ratedId     Int
   rated       User @relation(name: "RatedRelation", fields: [ratedId], references: [id], onDelete: Cascade)
+
+  eventId     Int
+  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@map("users_rating")
 }
@@ -81,6 +138,34 @@ model EventRegistrations {
   @@map("events_registrations")
 }
 
+model MessageComplaint {
+  id Int @id @default(autoincrement())
+  messageId Int
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  categoryId Int
+  category ComplaintsCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model EventComplaint {
+  id Int @id @default(autoincrement())
+  eventId Int
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  categoryId Int
+  category ComplaintsCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model ComplaintsCategory {
+  id Int @id @default(autoincrement())
+  title String
+  description String?
+  eventComplaint EventComplaint[]
+  messageComplaint MessageComplaint[]
+
+  @@map("complaints_categories")
+}
+
 model Message {
   id          Int    @id @default(autoincrement())
   message     String
@@ -94,7 +179,21 @@ model Message {
   userId      Int
   user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  messageComplaint MessageComplaint[]
+
   @@map("messages")
+}
+
+model Photo {
+  id          Int    @id @default(autoincrement())
+  photo       String
+  description String? 
+
+  eventId     Int
+  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  @@map("photos")
 }
 
 model Notification {
@@ -114,13 +213,58 @@ model Notification {
   @@map("notifications")
 }
 
-model Category {
+model Location {
   id          Int     @id @default(autoincrement())
+  details     String?
+  cityId      Int
+  city        City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  event       Event[]
+  @@map("locations")
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String?
+  parentId     Int? 
+
+  parent        Category? @relation("SubCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  subCategories Category[] @relation("SubCategory")
+  
+  events               Event[]   
+  preferenceCategories PreferenceCategory[]
+
+  @@map("categories")
+}
+
+model Format {
+  id          Int   @id @default(autoincrement())
   title       String
   description String?
 
-  event       Event[]
+  event             Event[]
+  preferenceFormats PreferenceFormat[]
 
-  @@map("categories")
+  @@map("formats")
+}
+
+model Country {
+  id          Int   @id @default(autoincrement())
+  countryName String
+
+  city        City[]
+  
+  @@map("countries")
+}
+
+model City {
+  id          Int   @id @default(autoincrement())
+  cityName    String
+  countryId   Int
+  country     Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  location    Location[]
+  @@map("cities")
 }
 

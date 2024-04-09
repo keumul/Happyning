@@ -48,10 +48,10 @@ export class UserService {
       })
       return user;
     } catch (error) {
-      if(error.code === 'P2002') {
+      if (error.code === 'P2002') {
         throw new ForbiddenException("Имя и почта должны быть уникальными", error);
       } else {
-      throw new NotFoundException("Что-то пошло не так", error);
+        throw new NotFoundException("Что-то пошло не так", error);
       }
     }
   }
@@ -69,23 +69,24 @@ export class UserService {
     }
   }
 
-  async rateUser(id: number, dto: RateDto, user) {
+  async rateUser(userId: number, eventId:number, dto: RateDto, user) {
     try {
 
       const rateuser = await this.prisma.userRating.create({
         data: {
           message: dto.message,
-          rater: { connect: { id: user.id } },
-          rated: { connect: { id: +id } },
+          rater: { connect: { id: +user.id } },
+          rated: { connect: { id: +userId } },
           rate: +dto.rate,
+          event: { connect: { id: +eventId } }
         }
       })
 
       await this.prisma.notification.create({
         data: {
-          message: 'Вы были оценены пользователем ' + user.username + ' на оценку ' + dto.rate,
-          userId: +id,
-          eventId: +id,
+          message: 'User ' + user.username + ' rated your event ' + dto.eventId + ' for a score of ' + dto.rate,
+          userId: +userId,
+          eventId: +eventId,
           isRead: false,
         },
       });
@@ -93,7 +94,7 @@ export class UserService {
       return rateuser;
     } catch (error) {
       console.log(error);
-      
+
       throw new NotFoundException("User does not exist", error);
     }
   }
@@ -116,7 +117,7 @@ export class UserService {
       const rate = await this.prisma.userRating.findMany()
       return rate;
     } catch (error) {
-      throw new NotFoundException("Something wrong!", error);
+      throw new NotFoundException("Something wrong when fetching user rates: ", error);
     }
   }
 

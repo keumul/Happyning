@@ -12,6 +12,12 @@ import { UserModule } from './user/user.module';
 import { ParticipantModule } from './participant/participant.module';
 import { QrCodeModule } from './qrcode/qrcode.module';
 import { ScheduleModule } from "@nestjs/schedule";
+import { MailingModule } from './mailing/mailing.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { FormatModule } from './format/format.module';
+import { LocationModule } from './location/location.module';
+import { PhotoModule } from './photo/photo.module';
 
 @Module({
   imports: [
@@ -26,8 +32,23 @@ import { ScheduleModule } from "@nestjs/schedule";
     ParticipantModule,
     QrCodeModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    MailingModule,
+    MailerModule.forRoot({
+      transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+      template: {
+        dir: process.cwd() + '/templates/',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+    FormatModule,
+    LocationModule,
+    PhotoModule,
   ],
   providers: [AppService],
+  controllers: [],
 })
 export class AppModule { }

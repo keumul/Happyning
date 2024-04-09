@@ -10,6 +10,7 @@ export class EventService {
 
   async createEvent(dto: EventDto, user) {
     try {
+      console.log(user);
 
       const startDateInMinsk = moment.tz(dto.startDate, 'Europe/Minsk').toDate();
       if (startDateInMinsk < new Date()) {
@@ -19,21 +20,24 @@ export class EventService {
         data: {
           title: dto.title,
           startDate: startDateInMinsk,
+          endDate: dto.endDate,
           description: dto.description,
           maxGuestAmount: +dto.maxGuestAmount,
           isPublic: Boolean(dto.isPublic),
-          location: dto.location,
-          organizerId: user.id,
+          locationId: +dto.locationId,
+          ageLimit: +dto.ageLimit,
+          organizerId: +user.id,
           categoryId: +dto.categoryId,
+          formatId: +dto.formatId,
           secretCode: dto.secretCode,
         },
       });
 
       await this.prisma.notification.create({
         data: {
-          message: 'Мероприятие успешно создано',
-          userId: user.id,
-          eventId: event.id,
+          message: 'Event successfuly created!',
+          userId: +user.id,
+          eventId: +event.id,
           isRead: false,
         },
       });
@@ -43,6 +47,8 @@ export class EventService {
         if (error.code === "P2003") {
           throw new NotFoundException("Refer to non-existent data");
         }
+      } else {
+        throw new ForbiddenException("Something went wrong when creating event: ", error.message);
       }
     }
   }
@@ -52,7 +58,7 @@ export class EventService {
       const events = await this.prisma.event.findMany();
       return events;
     } catch (error) {
-      throw new ForbiddenException("Something went wrong", error);
+      throw new ForbiddenException("Something went wrong when fetching events: ", error.message);
     }
   }
 
@@ -65,7 +71,7 @@ export class EventService {
       });
       return events;
     } catch (error) {
-      throw new ForbiddenException("Something went wrong", error);
+      throw new ForbiddenException("Something went wrong when fetching user events: ", error.message);
     }
   }
 
@@ -77,7 +83,7 @@ export class EventService {
     });
 
     if (!event) {
-      throw new NotFoundException("Something went wrong");
+      throw new NotFoundException("Something went wrong when fetching event");
     }
     return event;
   }
@@ -100,16 +106,18 @@ export class EventService {
           description: dto.description,
           maxGuestAmount: +dto.maxGuestAmount,
           isPublic: dto.isPublic,
-          location: dto.location,
+          locationId: +dto.locationId,
+          ageLimit: +dto.ageLimit,
           organizerId: user.id,
           categoryId: +dto.categoryId,
+          formatId: +dto.formatId,
           secretCode: dto.secretCode,
         },
       });
 
       return event;
     } catch (error) {
-      throw new ForbiddenException("Something went wrong", error);
+      throw new ForbiddenException("Something went wrong when updating event: ", error.message);
     }
   }
 
@@ -122,7 +130,7 @@ export class EventService {
       });
       return event;
     } catch (error) {
-      throw new NotFoundException("Something went wrong", error);
+      throw new NotFoundException("Something went wrong when deleting event: ", error.message);
     }
   }
 }

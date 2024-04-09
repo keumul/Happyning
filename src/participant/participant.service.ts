@@ -82,7 +82,7 @@ export class ParticipantService {
       const qrCodeImage = await this.qrCodeService.generateQrCode(JSON.stringify(participant));
       await this.prisma.notification.create({
         data: {
-          message: 'QR-код для подтверждения регистрации на мероприятие готов',
+          message: 'QR-code for event registration is ready!',
           userId: user.id,
           eventId: event.id,
           isRead: false,
@@ -107,7 +107,7 @@ export class ParticipantService {
       });
       return participants;
     } catch (error) {
-      throw new ForbiddenException("Something went wrong", error);
+      throw new ForbiddenException("Something went wrong when fetchin all event participants: ", error);
     }
   }
 
@@ -173,7 +173,7 @@ export class ParticipantService {
     } catch (error) {
       console.log(error);
 
-      throw new ForbiddenException("Something went wrong", error);
+      throw new ForbiddenException("Something went wrong when removing event participant: ", error);
     }
   }
 }

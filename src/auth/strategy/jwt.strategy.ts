@@ -12,11 +12,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: true,
       secretOrKey: config.get("JWT_SECRET"),
     });
   }
 
-  async validate(payload: { sub: number; username: string; isAdmin: boolean }) {
+  async validate(payload: { sub: number; username: string; role: string; isConfirmed: boolean}) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: payload.sub,

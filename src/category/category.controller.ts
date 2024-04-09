@@ -3,20 +3,25 @@ import { CategoryService } from "./category.service";
 import { CategoryDto } from "./dto/category.dto";
 import { AdminGuard, JwtGuard } from "src/auth/guard";
 
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller("api/categories")
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post()
-  @UseGuards(AdminGuard)
-  createCategory(@Body() dto: CategoryDto) {
-    return this.categoryService.createCategory(dto);
+  @Post(":id")
+  // @UseGuards(AdminGuard)
+  createCategory(@Param() params: any, @Body() dto: CategoryDto) {
+    return this.categoryService.createCategory(params.id, dto);
   }
 
   @Get()
   findAllCategories() {
     return this.categoryService.findAllCategories();
+  }
+
+  @Get("subcategories/:id")
+  findSubcategories(@Param() params: any) {
+    return this.categoryService.findSubcategories(params.id);
   }
 
   @Get(":id")
@@ -25,14 +30,14 @@ export class CategoryController {
   }
 
   @Patch(":id")
-  @UseGuards(AdminGuard)
-  update( @Param("id") id: string, @Body() dto: CategoryDto ) {
+  // @UseGuards(AdminGuard)
+  updateCategory( @Param("id") id: string, @Body() dto: CategoryDto ) {
     return this.categoryService.updateCategory(+id, dto);
   }
 
   @Delete(":id")
-  @UseGuards(AdminGuard)
-  remove(@Param("id") id: string) {
+  // @UseGuards(AdminGuard)
+  removeCategory(@Param("id") id: string) {
     return this.categoryService.removeCategory(+id);
   }
 }

@@ -32,7 +32,7 @@ export class EventController {
   }
 
   @Patch(":id")
-  @UseGuards(UserGuard)
+  // @UseGuards(UserGuard)
   updateEvent(@Param("id") id: string, @Body() dto: EventDto, @GetUser() user: User) {
     return this.eventService.updateEvent(+id, dto, user);
   }

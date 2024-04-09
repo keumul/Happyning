@@ -10,4 +10,7 @@ export class UserDto {
     @IsString() 
     password: string;
     bday: Date;
+    role: string;
+    isConfirmed: boolean;
+    activationCode: string;
 }

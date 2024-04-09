@@ -6,12 +6,13 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async createCategory(dto: CategoryDto) {
+  async createCategory(id: number, dto: CategoryDto) {
     try {
     const category = await this.prisma.category.create({
       data: {
         title: dto.title,
         description: dto.description,
+        parentId: +id
       },
     });
     return category;
@@ -23,6 +24,19 @@ export class CategoryService {
   async findAllCategories() {
     try {
       const categories = await this.prisma.category.findMany();
+      return categories;
+    } catch (error) {
+      throw new ForbiddenException("Something went wrong", error);
+    }
+  }
+
+  async findSubcategories(id: number) {
+    try {
+      const categories = await this.prisma.category.findMany({
+        where: {
+          parentId: +id
+        }
+      });
       return categories;
     } catch (error) {
       throw new ForbiddenException("Something went wrong", error);

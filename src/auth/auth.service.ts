@@ -1,10 +1,11 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthDto, LoginDto } from "./dto";
-import * as argon from "argon2";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { hash, verify } from "argon2";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { User } from '@prisma/client';
+import { MailingService } from "src/mailing/mailing.service";
 
 @Injectable({})
 export class AuthService {
@@ -12,62 +13,100 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
-  ) {}
+    private mailing: MailingService,
+  ) { }
+
+  token: String;
 
   async signup(dto: AuthDto) {
-    const hashedPassword = await argon.hash(dto.password);
-
     try {
+      const existingUser = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: dto.email },
+            { username: dto.username }
+          ]
+        }
+      });
+
+      if (existingUser) {
+        throw new BadRequestException('User already exists')
+      }
+
       const newUser = await this.prisma.user.create({
         data: {
           username: dto.username,
           email: dto.email,
-          password: hashedPassword,
+          password: await hash(dto.password),
           bday: dto.bday,
-          isAdmin: dto.isAdmin as boolean,
+          role: dto.role,
+          isConfirmed: false
         },
       });
-      console.log(dto);
-      console.log(newUser);
-      return this.signToken(newUser.id, newUser.username, newUser.isAdmin);
+
+      await this.mailing.sendMail(dto.email, newUser.activationCode);
+
+      return newUser;
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === "P2002") {
-          throw new ForbiddenException("Username or email already exists");
-        }
-      }
+      throw new BadRequestException(error);
     }
   }
 
   async signin(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        username: dto.username,
-      },
-    });
+    const user = await this.validateUser(dto);
+
+    console.log(dto);
 
     if (!user) {
       throw new ForbiddenException("User not found");
+    } else if (user.activationCode === null) {
+      throw new ForbiddenException("Check email to activate your account");
     }
 
-    const isPasswordCorrect = await argon.verify(user.password, dto.password);
+    const isPasswordCorrect = await verify(user.password, dto.password);
 
     if (!isPasswordCorrect) {
       throw new ForbiddenException("Password is incorrect");
     }
 
-    return this.signToken(user.id, user.username, user.isAdmin);
+    if (!user.isConfirmed && dto.activationCode != "nocode") {
+      if (user.activationCode.toLowerCase() === dto.activationCode.toLowerCase()) {
+
+
+        await this.prisma.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            isConfirmed: true
+          }
+        });
+        return this.signToken(user.id, user.username, user.role, user.isConfirmed)
+
+      } else {
+        throw new ForbiddenException("Verification code is incorrect");
+      }
+
+    }
+    if (!user.isConfirmed && dto.activationCode == "nocode") {
+      return this.signToken(user.id, user.username, user.role, user.isConfirmed)
+    } else if (user.isConfirmed) {
+      return this.signToken(user.id, user.username, user.role, user.isConfirmed)
+    }
+
   }
 
   async signToken(
     userId: number,
     username: string,
-    isAdmin: boolean,
+    role: string,
+    isConfirmed: boolean
   ): Promise<{ access_token: string }> {
     const payload = {
       sub: userId,
       username,
-      isAdmin,
+      role,
+      isConfirmed
     };
 
     const secret = this.config.get("JWT_SECRET");
@@ -75,9 +114,97 @@ export class AuthService {
       expiresIn: "5h",
       secret: secret,
     });
+    console.log(token);
 
     return {
       access_token: token,
     };
+  }
+
+  async validateUser(dto: LoginDto) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username: dto.username,
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordCorrect = await verify(user.password, dto.password);
+
+    if (!isPasswordCorrect) {
+      throw new NotFoundException('Wrong password!');
+    }
+
+    return user;
+  }
+
+  async activate(activationCode: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        activationCode
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException('Activation code not found');
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        activationCode: null
+      }
+    });
+
+    const token = await this.signToken(user.id, user.username, user.role, user.isConfirmed);
+
+    return {
+      user: this.returnUserFields,
+      ...token
+    }
+  }
+
+  async confirmationStatus(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username: username
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user.isConfirmed;
+  }
+
+  async resendActivationCode(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.mailing.sendMail(username, user.activationCode);
+
+    return user;
+  }
+
+
+  private returnUserFields(user: User) {
+    return {
+      username: user.username,
+      id: user.id,
+      role: user.role
+    }
   }
 }
