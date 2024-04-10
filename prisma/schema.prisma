@@ -16,7 +16,7 @@ model User {
   role           String  
   createdAt      DateTime  @default(now())
   isConfirmed    Boolean
-  activationCode String?  @default(cuid())  //NEW
+  activationCode String?  @default(cuid())                                     //NEW
 
   event              Event[]
   eventRegistrations EventRegistrations[]

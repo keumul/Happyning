@@ -18,6 +18,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { FormatModule } from './format/format.module';
 import { LocationModule } from './location/location.module';
 import { PhotoModule } from './photo/photo.module';
+import { ComplaintModule } from './complaint/complaint.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { PhotoModule } from './photo/photo.module';
     FormatModule,
     LocationModule,
     PhotoModule,
+    ComplaintModule,
   ],
   providers: [AppService],
   controllers: [],

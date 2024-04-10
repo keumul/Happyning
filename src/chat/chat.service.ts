@@ -21,6 +21,7 @@ export class ChatService {
 				id: newMessage.id
 			},
 			select: {
+				id: true,
 				message: true,
 				createdAt: true,
 				user: {
@@ -40,6 +41,7 @@ export class ChatService {
 				eventId: chatId
 			},
 			select: {
+				id: true,
 				message: true,
 				createdAt: true,
 				user: {
