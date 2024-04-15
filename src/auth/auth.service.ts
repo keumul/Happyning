@@ -55,8 +55,6 @@ export class AuthService {
   async signin(dto: LoginDto) {
     const user = await this.validateUser(dto);
 
-    console.log(dto);
-
     if (!user) {
       throw new ForbiddenException("User not found");
     } else if (user.activationCode === null) {
@@ -198,7 +196,6 @@ export class AuthService {
 
     return user;
   }
-
 
   private returnUserFields(user: User) {
     return {

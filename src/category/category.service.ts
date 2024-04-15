@@ -12,7 +12,7 @@ export class CategoryService {
       data: {
         title: dto.title,
         description: dto.description,
-        parentId: +id
+        parentId: +id || null
       },
     });
     return category;
@@ -57,7 +57,7 @@ export class CategoryService {
     return category;
   }
 
-  async updateCategory(id: number, dto: CategoryDto) {
+  async updateCategory(id: number, parentId: number, dto: CategoryDto) {
     try {
       const category = await this.prisma.category.update({
         where: {
@@ -66,6 +66,7 @@ export class CategoryService {
         data: {
           title: dto.title,
           description: dto.description,
+          parentId: +parentId
         },
       });
       return category;

@@ -15,7 +15,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post("signin")
   signin(@Body() authDto: LoginDto){
-    console.log("test controller");
     return this.authService.signin(authDto)
   }
 

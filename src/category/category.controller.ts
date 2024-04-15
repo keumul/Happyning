@@ -29,10 +29,10 @@ export class CategoryController {
     return this.categoryService.findCategory(params.id);
   }
 
-  @Patch(":id")
+  @Patch(":id/:parentId")
   // @UseGuards(AdminGuard)
-  updateCategory( @Param("id") id: string, @Body() dto: CategoryDto ) {
-    return this.categoryService.updateCategory(+id, dto);
+  updateCategory( @Param() params: any, @Body() dto: CategoryDto ) {
+    return this.categoryService.updateCategory(params.id, params.parentId, dto);
   }
 
   @Delete(":id")

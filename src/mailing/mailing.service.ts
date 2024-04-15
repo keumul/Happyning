@@ -22,16 +22,20 @@ export class MailingService {
 
       });
       
-      const username = await this.prisma.user.findFirst({
-        where: {
-          username: email
-        }
-      });
+      // const username = await this.prisma.user.findFirst({
+      //   where: {
+      //     username: email
+      //   }
+      // });
 
-      if (username.username === email) {
-        email = username.email;
-      }
+      // if (username.username === email) {
+      //   console.log('Username: ', username.username);
+        
+      //   email = username.email;
+      // }
 
+      console.log('Email: ', email);
+      
       const mailOptions = {
         from: this.configService.get('SMTP_USER'),
         to: email,

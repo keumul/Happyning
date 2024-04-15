@@ -67,4 +67,16 @@ export class UserController {
   removeUserRate(@Param() param: any, @GetUser() user: User) {
     return this.userService.removeUserRate(param.id, user);
   }
+
+  @Patch("moderator/:id")
+  // @UseGuards(UserGuard)
+  addModerator(@Param() param: any) {
+    return this.userService.addModerator(param.id);
+  }
+
+  @Patch("user/:id") 
+  // @UseGuards(UserGuard)
+  removeModerator(@Param() param: any) {
+    return this.userService.removeModerator(param.id);
+  }
 }

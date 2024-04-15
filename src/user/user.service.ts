@@ -147,4 +147,36 @@ export class UserService {
       throw new NotFoundException("User does not exist", error);
     }
   }
+
+  async addModerator(id: number) {
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          id: +id
+        },
+        data: {
+          role: 'moderator'
+        }
+      })
+      return user;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async removeModerator(id: number) {
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          id: +id
+        },
+        data: {
+          role: 'user'
+        }
+      })
+      return user;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
 }
