@@ -8,10 +8,10 @@ import { AdminGuard, JwtGuard } from "src/auth/guard";
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post(":id")
+  @Post()
   // @UseGuards(AdminGuard)
-  createCategory(@Param() params: any, @Body() dto: CategoryDto) {
-    return this.categoryService.createCategory(params.id, dto);
+  createCategory(@Body() dto: CategoryDto) {
+    return this.categoryService.createCategory(dto);
   }
 
   @Get()
@@ -19,20 +19,15 @@ export class CategoryController {
     return this.categoryService.findAllCategories();
   }
 
-  @Get("subcategories/:id")
-  findSubcategories(@Param() params: any) {
-    return this.categoryService.findSubcategories(params.id);
-  }
-
   @Get(":id")
   findOne(@Param() params: any) {
     return this.categoryService.findCategory(params.id);
   }
 
-  @Patch(":id/:parentId")
+  @Patch(":id")
   // @UseGuards(AdminGuard)
   updateCategory( @Param() params: any, @Body() dto: CategoryDto ) {
-    return this.categoryService.updateCategory(params.id, params.parentId, dto);
+    return this.categoryService.updateCategory(params.id, dto);
   }
 
   @Delete(":id")

@@ -45,6 +45,42 @@ export class ComplaintService {
         }
     }
 
+    async getUserMessageComplaints(userId: number) {
+        try {
+            const messageComplaints = await this.prisma.messageComplaint.findMany({
+                where: {
+                    message: {
+                        userId: +userId
+                    }
+                }, include: {
+                    message: true,
+                    category: true
+                }
+            });
+            return messageComplaints;
+        } catch (error) {
+            throw new Error("Something went wrong with getting the complaints");
+        }
+    }
+
+    async getUserEventComplaints(userId: number) {
+        try {
+            const eventComplaints = await this.prisma.eventComplaint.findMany({
+                where: {
+                    event: {
+                        organizerId: +userId
+                    }
+                }, include: {
+                    category: true,
+                    event: true
+                }
+            });
+            return eventComplaints;
+        } catch (error) {
+            throw new Error("Something went wrong with getting the complaints");
+        }
+    }
+
     async getAllEventComplaints() {
         try {
             const complaints = await this.prisma.eventComplaint.findMany();
@@ -148,4 +184,6 @@ export class ComplaintService {
             throw new Error("Something went wrong with deleting the complaint");
         }
     }
+
+
 }

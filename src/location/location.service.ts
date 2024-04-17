@@ -209,7 +209,8 @@ export class LocationService {
                     id: +id
                 },
                 data: {
-                    details: dto.details
+                    details: dto.details,
+                    cityId: dto.cityId
                 }
             });
         } catch (error) {

@@ -79,4 +79,16 @@ export class UserController {
   removeModerator(@Param() param: any) {
     return this.userService.removeModerator(param.id);
   }
+
+  @Patch("ban/:id")
+  // @UseGuards(UserGuard)
+  banUser(@Param() param: any) {
+    return this.userService.banUser(param.id);
+  }
+
+  @Patch("unban/:id")
+  // @UseGuards(UserGuard)
+  unbanUser(@Param() param: any) {
+    return this.userService.unbanUser(param.id);
+  }
 }

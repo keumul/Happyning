@@ -179,4 +179,36 @@ export class UserService {
       throw new NotFoundException("User does not exist", error);
     }
   }
+
+  async banUser(id: number) {
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          id: +id
+        },
+        data: {
+          role: 'banned'
+        }
+      })
+      return user;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async unbanUser(id: number) {
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          id: +id
+        },
+        data: {
+          role: 'user'
+        }
+      })
+      return user;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
 }

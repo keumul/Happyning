@@ -28,6 +28,16 @@ export class ComplaintController {
         return this.complaintService.getMessageComplaint(params.id);
     }
 
+    @Get('message/user/:userId')
+    findUserMessageComplaints(@Param() params: any) {
+        return this.complaintService.getUserMessageComplaints(params.userId);
+    }
+
+    @Get('event/user/:userId')
+    findUserEventComplaints(@Param() params: any) {
+        return this.complaintService.getUserEventComplaints(params.userId);
+    }
+
     @Post('message/:messageId/:categoryId')
     createMessageComplaint(@Param() params: any) {
         return this.complaintService.createMessageComplaint(params.messageId, params.categoryId);
@@ -37,7 +47,6 @@ export class ComplaintController {
     createEventComplaint(@Param() params: any) {
         return this.complaintService.createEventComplaint(params.eventId, params.categoryId);
     }
-
 
     @Get('categories')
     findAllComplaintsCategories() {

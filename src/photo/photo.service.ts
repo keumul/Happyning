@@ -20,7 +20,6 @@ export class PhotoService {
         },
       });
     } catch (error) {
-      console.log(error);
       throw new ForbiddenException("Something went wrong when uploading photo: ", error.message);
     }
   }
@@ -37,7 +36,6 @@ export class PhotoService {
       });
       return photos;
     } catch (error) {
-      console.log(error.message);
       throw new ForbiddenException("Something went wrong when fetching photos: ", error.message);
     }
   }
@@ -53,9 +51,7 @@ export class PhotoService {
         }
       });
       return photo[0].photo.toString();
-      // return photo
     } catch (error) {
-      console.log(error.message);
       throw new ForbiddenException("Something went wrong when fetching photo: ", error.message);
     }
   }
@@ -69,8 +65,6 @@ export class PhotoService {
       });
       return photo;
     } catch (error) {
-      console.log(error.message);
-
       throw new ForbiddenException("Something went wrong when deleting photo: ", error.message);
     }
   }

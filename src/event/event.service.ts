@@ -10,8 +10,6 @@ export class EventService {
 
   async createEvent(dto: EventDto, user) {
     try {
-      console.log(user);
-
       const startDateInMinsk = moment.tz(dto.startDate, 'Europe/Minsk').toDate();
       if (startDateInMinsk < new Date()) {
         throw new ForbiddenException("You can't create an event in the past");
@@ -79,7 +77,7 @@ export class EventService {
     const event = await this.prisma.event.findFirst({
       where: {
         id: +id,
-      },
+      }
     });
 
     if (!event) {
@@ -90,7 +88,6 @@ export class EventService {
 
   async updateEvent(id: number, dto: EventDto, user) {
     try {
-
       const startDateInMinsk = moment.tz(dto.startDate, 'Europe/Minsk').toDate();
       if (startDateInMinsk < new Date()) {
         throw new ForbiddenException("You can't create an event in the past");

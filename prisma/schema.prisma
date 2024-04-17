@@ -226,10 +226,6 @@ model Category {
   id           Int       @id @default(autoincrement())
   title        String
   description  String?
-  parentId     Int? 
-
-  parent        Category? @relation("SubCategory", fields: [parentId], references: [id], onDelete: Cascade)
-  subCategories Category[] @relation("SubCategory")
   
   events               Event[]   
   preferenceCategories PreferenceCategory[]

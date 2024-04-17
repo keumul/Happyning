@@ -112,7 +112,6 @@ export class AuthService {
       expiresIn: "5h",
       secret: secret,
     });
-    console.log(token);
 
     return {
       access_token: token,

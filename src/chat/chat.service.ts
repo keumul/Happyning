@@ -53,7 +53,7 @@ export class ChatService {
 				latency: true
 			},
 			orderBy: {
-				createdAt: 'asc'
+				createdAt: 'desc'
 			}
 		});
 	}

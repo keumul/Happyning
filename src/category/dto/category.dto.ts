@@ -7,6 +7,4 @@ export class CategoryDto {
 
   @IsString()
   description: string;
-
-  parentId: number;
 }
