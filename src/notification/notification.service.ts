@@ -9,12 +9,12 @@ export class NotificationService {
     private readonly prisma: PrismaService
   ) { }
 
-  createNotification(dto: NotificationDto) {
+  createNotification(eventId: number, userId: number, dto: NotificationDto) {
     const notification = this.prisma.notification.create({
       data: {
         message: dto.message,
-        userId: +dto.user,
-        eventId: +dto.event,
+        userId: +userId,
+        eventId: +eventId,
         isRead: false
       }
     })
@@ -42,7 +42,15 @@ export class NotificationService {
         isRead: true
       }
     })
+    return notification;
+  }
 
+  deleteNotification(id: number) {
+    const notification = this.prisma.notification.delete({
+      where: {
+        id: +id
+      }
+    })
     return notification;
   }
 }

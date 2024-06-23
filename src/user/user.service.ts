@@ -49,9 +49,9 @@ export class UserService {
       return user;
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ForbiddenException("Имя и почта должны быть уникальными", error);
+        throw new ForbiddenException("Username and email must be unique", error);
       } else {
-        throw new NotFoundException("Что-то пошло не так", error);
+        throw new NotFoundException("Something went wrong", error);
       }
     }
   }
@@ -207,6 +207,19 @@ export class UserService {
         }
       })
       return user;
+    } catch (error) {
+      throw new NotFoundException("User does not exist", error);
+    }
+  }
+
+  async findOrganizerEvents(id: number) {
+    try {
+      const events = await this.prisma.event.findMany({
+        where: {
+          organizerId: +id
+        }
+      })
+      return events;
     } catch (error) {
       throw new NotFoundException("User does not exist", error);
     }

@@ -31,6 +31,11 @@ export class AuthService {
 
       if (existingUser) {
         throw new BadRequestException('User already exists')
+      } 
+
+      const date = new Date(dto.bday);
+      if(date >= new Date()) {
+        throw new BadRequestException('The date of birth cannot be later than todays date')
       }
 
       const newUser = await this.prisma.user.create({

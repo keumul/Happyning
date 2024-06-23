@@ -19,6 +19,7 @@ import { FormatModule } from './format/format.module';
 import { LocationModule } from './location/location.module';
 import { PhotoModule } from './photo/photo.module';
 import { ComplaintModule } from './complaint/complaint.module';
+import { PreferenceModule } from './preference/preference.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ComplaintModule } from './complaint/complaint.module';
     LocationModule,
     PhotoModule,
     ComplaintModule,
+    PreferenceModule,
   ],
   providers: [AppService],
   controllers: [],

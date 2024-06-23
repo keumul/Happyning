@@ -25,50 +25,20 @@ model User {
   notification       Notification[]
   message            Message[]
   preference         Preference[]
-  confirmation       Confirmation[]
 
   @@map("users")
-}
-
-model Confirmation {
-  id           Int @id @default(autoincrement())
-  userId       Int
-  confirmValue String 
-  expiration   DateTime
-
-  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)  
-  
-  @@map("confirmations")
 }
 
 model Preference {
   id               Int                 @id @default(autoincrement())
   userId           Int
   user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  preferenceCategories PreferenceCategory[]
-  preferenceFormats    PreferenceFormat[]
+  categoryId       Int
+  category         Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  formatId         Int
+  format           Format              @relation(fields: [formatId], references: [id], onDelete: Cascade)
   
   @@map("preferences")
-}
-
-model PreferenceCategory {
-  id           Int     @id @default(autoincrement())
-  preferenceId Int
-  categoryId   Int
-  preference   Preference @relation(fields: [preferenceId], references: [id], onDelete: Cascade)
-  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@map("preference_categories")
-}
-
-model PreferenceFormat {
-  id           Int     @id @default(autoincrement())
-  preferenceId Int
-  formatId     Int
-  preference   Preference @relation(fields: [preferenceId], references: [id], onDelete: Cascade)
-  format       Format     @relation(fields: [formatId], references: [id], onDelete: Cascade)
-
-  @@map("preference_formats")
 }
 
 model Event {
@@ -228,7 +198,7 @@ model Category {
   description  String?
   
   events               Event[]   
-  preferenceCategories PreferenceCategory[]
+  preference           Preference[]
 
   @@map("categories")
 }
@@ -239,7 +209,7 @@ model Format {
   description String?
 
   event             Event[]
-  preferenceFormats PreferenceFormat[]
+  preference        Preference[]
 
   @@map("formats")
 }

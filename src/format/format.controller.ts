@@ -3,13 +3,13 @@ import { FormatService } from "./format.service";
 import { FormatDto } from "./dto/format.dto";
 import { AdminGuard, JwtGuard } from "src/auth/guard";
 
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller("api/formats")
 export class FormatController {
   constructor(private readonly formatService: FormatService) {}
 
   @Post()
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   createFormat(@Body() dto: FormatDto) {
     return this.formatService.createFormat(dto);
   }
@@ -25,13 +25,13 @@ export class FormatController {
   }
 
   @Patch(":id")
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   updateFormat( @Param("id") id: string, @Body() dto: FormatDto ) {
     return this.formatService.updateFormat(+id, dto);
   }
 
   @Delete(":id")
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   removeFormat(@Param("id") id: string) {
     return this.formatService.removeFormat(+id);
   }

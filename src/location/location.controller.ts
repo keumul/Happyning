@@ -1,15 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { LocationDto } from './dto/location.dto';
 import { CityDto } from './dto/city.dto';
 import { CountryDto } from './dto/country.dto';
+import { AdminGuard, JwtGuard } from 'src/auth/guard';
 
+@UseGuards(JwtGuard)
 @Controller('api/locations')
 export class LocationController {
     constructor(private readonly locationService: LocationService) {}
 
     //CITY
     @Post("city/:id")
+    @UseGuards(AdminGuard)
     createCity(@Param() params: any, @Body() dto: CityDto) {
       return this.locationService.createCity(params.id, dto);
     }
@@ -31,17 +34,20 @@ export class LocationController {
     }
 
     @Patch("city/:id")
+    @UseGuards(AdminGuard)
     updateCity(@Param() params: any, @Body() dto: CityDto) {
         return this.locationService.updateCity(params.id, dto);
     }
 
     @Delete("city/:id")
+    @UseGuards(AdminGuard)
     deleteCity(@Param() params: any) {
         return this.locationService.deleteCity(params.id);
     }
 
     //COUNTRY
     @Post("country")
+    @UseGuards(AdminGuard)
     createCountry(@Body() dto: CountryDto) {
       return this.locationService.createCountry(dto);
     }
@@ -57,11 +63,13 @@ export class LocationController {
     }
 
     @Patch("country/:id")
+    @UseGuards(AdminGuard)
     updateCountry(@Param() params: any, @Body() dto: CountryDto) {
         return this.locationService.updateCountry(params.id, dto);
     }
 
     @Delete("country/:id")
+    @UseGuards(AdminGuard)
     deleteCountry(@Param() params: any) {
         return this.locationService.deleteCountry(params.id);
     }

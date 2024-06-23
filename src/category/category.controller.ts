@@ -3,13 +3,13 @@ import { CategoryService } from "./category.service";
 import { CategoryDto } from "./dto/category.dto";
 import { AdminGuard, JwtGuard } from "src/auth/guard";
 
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller("api/categories")
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   createCategory(@Body() dto: CategoryDto) {
     return this.categoryService.createCategory(dto);
   }
@@ -25,13 +25,13 @@ export class CategoryController {
   }
 
   @Patch(":id")
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   updateCategory( @Param() params: any, @Body() dto: CategoryDto ) {
     return this.categoryService.updateCategory(params.id, dto);
   }
 
   @Delete(":id")
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   removeCategory(@Param("id") id: string) {
     return this.categoryService.removeCategory(+id);
   }

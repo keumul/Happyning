@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { GetUser } from "src/auth/decorator";
-import { AdminGuard, JwtGuard, UserGuard } from "src/auth/guard";
+import { AdminGuard, JwtGuard, ModeratorGuard, UserGuard } from "src/auth/guard";
 import { UserService } from "./user.service";
 import { UserDto } from "./dto/user.dto";
 import { RateDto } from "./dto/rate.dto";
@@ -18,7 +18,6 @@ export class UserController {
   }
 
   @Get()
-  // @UseGuards(AdminGuard)
   findAllUsers() {
     return this.userService.findAllUsers();
   }
@@ -26,6 +25,11 @@ export class UserController {
   @Get("user/:id")
   findUser(@Param() param: any) {
     return this.userService.findUser(param.id);
+  }
+
+  @Get("organizer/:id")
+  findOrganizerEvents(@Param() param: any) {
+    return this.userService.findOrganizerEvents(param.id);
   }
 
   @Patch(":id")
@@ -40,19 +44,18 @@ export class UserController {
   }
 
   @Post("rate/:userId/:eventId")
-  // @UseGuards(UserGuard)
+  @UseGuards(UserGuard)
   rateUser(@Param() params: any, @Body() dto: RateDto, @GetUser() user: User) {
     return this.userService.rateUser(params.userId, params.eventId, dto, user);
   }
 
   @Get("rates")
-  // @UseGuards(AdminGuard)
   findAllUserRates() {
     return this.userService.findAllUserRates();
   }
 
   @Get("myrate")
-  // @UseGuards(UserGuard)
+  @UseGuards(UserGuard)
   findCurrentUserRate(@GetUser() user: User) {
     return this.userService.findCurrentUserRate(user);
   }
@@ -63,31 +66,30 @@ export class UserController {
   }
 
   @Delete("rate/:id")
-  // @UseGuards(UserGuard)
   removeUserRate(@Param() param: any, @GetUser() user: User) {
     return this.userService.removeUserRate(param.id, user);
   }
 
   @Patch("moderator/:id")
-  // @UseGuards(UserGuard)
+  @UseGuards(AdminGuard)
   addModerator(@Param() param: any) {
     return this.userService.addModerator(param.id);
   }
 
   @Patch("user/:id") 
-  // @UseGuards(UserGuard)
+  @UseGuards(AdminGuard)
   removeModerator(@Param() param: any) {
     return this.userService.removeModerator(param.id);
   }
 
   @Patch("ban/:id")
-  // @UseGuards(UserGuard)
+  @UseGuards(ModeratorGuard)
   banUser(@Param() param: any) {
     return this.userService.banUser(param.id);
   }
 
   @Patch("unban/:id")
-  // @UseGuards(UserGuard)
+  @UseGuards(ModeratorGuard)
   unbanUser(@Param() param: any) {
     return this.userService.unbanUser(param.id);
   }

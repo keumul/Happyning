@@ -4,10 +4,10 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 export class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const isUser = request.user && !request.user.isAdmin;
+    const role = request.user && request.user.role;
 
-    if (!isUser) {
-      throw new ForbiddenException('Access denied. This is not for administrators.');
+    if (role !== 'user') {
+      throw new ForbiddenException('Access denied. This is only for users.');
     }
 
     return true;

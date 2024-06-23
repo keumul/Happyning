@@ -16,9 +16,29 @@ export class ParticipantController {
     return this.participantService.addParticipant(dto, user);
   }
 
+  @Get('mostpopular')
+  findMostPopularEvent() {
+    return this.participantService.findMostPopularEvent();
+  }
+
+  @Get('mostpopular/category')
+  findMostPopularCategory() {
+    return this.participantService.findMostPopularCategory();
+  }
+
+  @Get('mostpopular/format')
+  findMostPopularFormat() {
+    return this.participantService.findMostPopularFormat();
+  }
+
   @Get(':id')
   findAllEventParticipants(@Param() event: any) {
     return this.participantService.findAllEventParticipants(event.id);
+  }
+
+  @Get('age/:id')
+  findEventParticipantsAge(@Param() event: any) {
+    return this.participantService.findEventParticipantsAge(event.id);
   }
 
   @Get('event/user/:id')

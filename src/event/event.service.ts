@@ -36,7 +36,7 @@ export class EventService {
           message: 'Event successfuly created!',
           userId: +user.id,
           eventId: +event.id,
-          isRead: false,
+          isRead: true,
         },
       });
       return event;

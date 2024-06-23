@@ -14,6 +14,7 @@ export class QrCodeController {
   async generateQrCode(@Param('id') id: string, @Res() res: Response) {
     try {
       const event = await this.eventService.findEvent(+id);
+      console.log(event);
       const qrCodeImage = await this.qrCodeService.generateQrCode(event.id.toString());
       res.status(200).send(qrCodeImage);
     } catch (error) {

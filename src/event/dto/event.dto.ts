@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 export class EventDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(20, {
+  @MaxLength(50, {
 		message: 'Too long title'
 	})
   title: string;

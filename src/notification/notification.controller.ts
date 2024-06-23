@@ -6,9 +6,9 @@ import { NotificationDto } from './dto/notification.dto';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Post()
-  createNotification(@Body() dto: NotificationDto) {
-    return this.notificationService.createNotification(dto);
+  @Post(':eventId/:userId')
+  createNotification(@Param() params: any, @Body() dto: NotificationDto) {
+    return this.notificationService.createNotification(params.eventId, params.userId, dto);
   }
 
   @Get('user/:id')
@@ -19,5 +19,10 @@ export class NotificationController {
   @Get(':id')
   pickNotification(@Param('id') id: number) {
     return this.notificationService.pickNotification(+id);
+  }
+
+  @Delete(':id')
+  deleteNotification(@Param('id') id: number) {
+    return this.notificationService.deleteNotification(+id);
   }
 }

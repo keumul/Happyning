@@ -17,13 +17,10 @@ export class ParticipantService {
         userId: user.id
       }
     });
-
     if (participant) {
       throw new ForbiddenException("You are already registered for this event");
     }
-
     try {
-
       const guestAmount = await this.prisma.eventRegistrations.findMany({
         where: {
           eventId: +dto.eventId
@@ -40,7 +37,6 @@ export class ParticipantService {
         }
       });
       await this.sendQrCodeNotification(user.id, +dto.eventId);
-
       return participant;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -56,15 +52,12 @@ export class ParticipantService {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
       });
-
       const event = await this.prisma.event.findUnique({
         where: { id: eventId },
       });
-
       if (!user || !event) {
         throw new Error('User or event not found');
       }
-
       const participant = await this.prisma.eventRegistrations.findFirst({
         where: {
           eventId: event.id,
@@ -78,14 +71,14 @@ export class ParticipantService {
           }
         }
       });
-
       const qrCodeImage = await this.qrCodeService.generateQrCode(JSON.stringify(participant));
+
       await this.prisma.notification.create({
         data: {
           message: 'QR-code for event registration is ready!',
           userId: user.id,
           eventId: event.id,
-          isRead: false,
+          isRead: true,
           qrCode: qrCodeImage,
         },
       });
@@ -174,6 +167,100 @@ export class ParticipantService {
       console.log(error);
 
       throw new ForbiddenException("Something went wrong when removing event participant: ", error);
+    }
+  }
+
+
+  async findEventParticipantsAge(eventId: number) {
+    try {
+      const participants = await this.prisma.eventRegistrations.findMany({
+        where: {
+          eventId: +eventId
+        },
+        select: {
+          user: {
+            select: {
+              bday: true
+            }
+          }
+        }
+      });
+
+      return participants;
+    } catch (error) {
+      throw new ForbiddenException("Something went wrong when fetching event participants: ", error);
+    }
+  }
+
+
+  async findMostPopularEvent() {
+    try {
+      const event = await this.prisma.eventRegistrations.groupBy({
+        by: ['eventId'],
+        _count: {
+          eventId: true
+        },
+        orderBy: {
+          _count: {
+            eventId: 'desc'
+          }
+        },
+      });
+      return event;
+    } catch (error) {
+      throw new ForbiddenException("Something went wrong when fetching most popular event: ", error);
+    }
+  }
+
+  async findMostPopularCategory() {
+    try {
+      const category = await this.prisma.eventRegistrations.findMany({
+        select: {
+          event: {
+            select: {
+              categoryId: true
+              }
+            }
+          }
+      });
+      
+      const categoryCount = category.reduce((acc, curr) => {
+        if (!acc[curr.event.categoryId]) { 
+          acc[curr.event.categoryId] = 1;
+        } else {
+          acc[curr.event.categoryId] += 1;
+        }
+        return acc;
+      }, {});
+      return categoryCount;
+    } catch (error) {
+      throw new ForbiddenException("Something went wrong when fetching most popular category: ", error);
+    }
+  }
+
+  async findMostPopularFormat() {
+    try {
+      const format = await this.prisma.eventRegistrations.findMany({
+        select: {
+          event: {
+            select: {
+              formatId: true
+            }
+          }
+        }
+      });
+
+      const formatCount = format.reduce((acc, curr) => {
+        if (!acc[curr.event.formatId]) {
+          acc[curr.event.formatId] = 1;
+        } else {
+          acc[curr.event.formatId] += 1;
+        }
+        return acc;
+      }, {});
+      return formatCount;
+    } catch (error) {
+      throw new ForbiddenException("Something went wrong when fetching most popular format: ", error);
     }
   }
 }

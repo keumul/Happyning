@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ComplaintsCategoryDto } from './dto/complaintsCategory.dto';
-import { MessageComplaintDto } from './dto/messageComplaint.dto';
-import { EventComplaintDto } from './dto/eventComplaint.dto';
 
 @Injectable()
 export class ComplaintService {

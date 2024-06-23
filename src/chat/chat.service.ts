@@ -15,7 +15,6 @@ export class ChatService {
 				latency: +dto.latency
 			}
 		});
-
 		return await this.prisma.message.findUnique({
 			where: {
 				id: newMessage.id

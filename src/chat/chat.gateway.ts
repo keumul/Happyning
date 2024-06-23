@@ -7,12 +7,9 @@ import { log } from 'console';
 @WebSocketGateway(5001, { namespace: '/chat' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
-
 	constructor(private readonly chatService: ChatService ) { 
- 
 		log('ChatGateway constructor');
 	}
-
 	async handleConnection(socket: Socket) {
 		log('ChatGateway handleConnection');
 		const chatId = socket.handshake.query.chatId;
